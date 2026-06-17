@@ -1,44 +1,343 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe</title>
+  <style>
+    :root {
+      --bg: #f6f4ef;
+      --ink: #1f2933;
+      --muted: #627080;
+      --panel: #ffffff;
+      --line: #d8dee6;
+      --x: #0f766e;
+      --o: #c2410c;
+      --accent: #334155;
+      --accent-hover: #1e293b;
+      --win: #facc15;
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-.row{
-	display: flex;
- 	}
+    * {
+      box-sizing: border-box;
+    }
 
-.box{
-  background-color: lightgrey;
-  height: 30px;
-  width: 30px;
-  border: 2px solid black;
-  padding: 50px;
-  margin: 2px;
-}
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      background: var(--bg);
+      color: var(--ink);
+    }
 
-</style>
+    main {
+      width: min(92vw, 430px);
+      padding: 28px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 8vw, 3rem);
+      line-height: 1;
+      text-align: center;
+    }
+
+    .status {
+      min-height: 28px;
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .scoreboard {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+
+    .score {
+      padding: 10px 8px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      text-align: center;
+      background: #fafafa;
+    }
+
+    .score span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .score strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 1.25rem;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      width: 100%;
+      aspect-ratio: 1;
+      margin: 0 auto 18px;
+    }
+
+    .cell {
+      width: 100%;
+      aspect-ratio: 1;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: #f8fafc;
+      color: var(--ink);
+      cursor: pointer;
+      font-size: clamp(3rem, 18vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1;
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    }
+
+    .cell:hover:not(:disabled),
+    .cell:focus-visible {
+      border-color: var(--accent);
+      background: #eef2f7;
+      outline: none;
+      transform: translateY(-1px);
+    }
+
+    .cell:disabled {
+      cursor: default;
+    }
+
+    .cell.x {
+      color: var(--x);
+    }
+
+    .cell.o {
+      color: var(--o);
+    }
+
+    .cell.win {
+      border-color: #eab308;
+      background: var(--win);
+      color: #171717;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    button.action {
+      min-height: 44px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--accent);
+      color: white;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    button.action:hover,
+    button.action:focus-visible {
+      background: var(--accent-hover);
+      outline: 3px solid rgba(51, 65, 85, 0.22);
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 380px) {
+      main {
+        padding: 18px;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
+  <main>
+    <h1>Tic Tac Toe</h1>
+    <p class="status" id="status" aria-live="polite">Player X's turn</p>
 
-<div class= "row">
-	<div class ="box"></div>
-	<div class ="box"></div>
-	<div class ="box"></div>
-</div>
+    <section class="scoreboard" aria-label="Scoreboard">
+      <div class="score">
+        <span>Player X</span>
+        <strong id="score-x">0</strong>
+      </div>
+      <div class="score">
+        <span>Draws</span>
+        <strong id="score-draw">0</strong>
+      </div>
+      <div class="score">
+        <span>Player O</span>
+        <strong id="score-o">0</strong>
+      </div>
+    </section>
 
-<div class= "row">
-	<div class ="box"></div>
-	<div class ="box"></div>
-	<div class ="box"></div>
-</div>
+    <section class="board" aria-label="Tic Tac Toe board">
+      <button class="cell" type="button" aria-label="Row 1, column 1" data-cell></button>
+      <button class="cell" type="button" aria-label="Row 1, column 2" data-cell></button>
+      <button class="cell" type="button" aria-label="Row 1, column 3" data-cell></button>
+      <button class="cell" type="button" aria-label="Row 2, column 1" data-cell></button>
+      <button class="cell" type="button" aria-label="Row 2, column 2" data-cell></button>
+      <button class="cell" type="button" aria-label="Row 2, column 3" data-cell></button>
+      <button class="cell" type="button" aria-label="Row 3, column 1" data-cell></button>
+      <button class="cell" type="button" aria-label="Row 3, column 2" data-cell></button>
+      <button class="cell" type="button" aria-label="Row 3, column 3" data-cell></button>
+    </section>
 
-<div class= "row">
-	<div class ="box"></div>
-	<div class ="box"></div>
-	<div class ="box"></div>
-</div>
+    <div class="controls">
+      <button class="action" type="button" id="restart">Restart round</button>
+      <button class="action" type="button" id="reset">Reset scores</button>
+    </div>
+  </main>
 
+  <script>
+    const cells = Array.from(document.querySelectorAll("[data-cell]"));
+    const statusText = document.querySelector("#status");
+    const restartButton = document.querySelector("#restart");
+    const resetButton = document.querySelector("#reset");
+    const scoreX = document.querySelector("#score-x");
+    const scoreO = document.querySelector("#score-o");
+    const scoreDraw = document.querySelector("#score-draw");
+
+    const winningLines = [
+      [0, 1, 2],
+      [3, 4, 5],
+      [6, 7, 8],
+      [0, 3, 6],
+      [1, 4, 7],
+      [2, 5, 8],
+      [0, 4, 8],
+      [2, 4, 6]
+    ];
+
+    let board = Array(9).fill("");
+    let currentPlayer = "X";
+    let gameOver = false;
+    let scores = {
+      X: 0,
+      O: 0,
+      draw: 0
+    };
+
+    function updateStatus(message) {
+      statusText.textContent = message;
+    }
+
+    function updateScores() {
+      scoreX.textContent = scores.X;
+      scoreO.textContent = scores.O;
+      scoreDraw.textContent = scores.draw;
+    }
+
+    function getWinningLine() {
+      return winningLines.find(function(line) {
+        const first = board[line[0]];
+        return first && line.every(function(index) {
+          return board[index] === first;
+        });
+      });
+    }
+
+    function endGame(winningLine) {
+      gameOver = true;
+
+      if (winningLine) {
+        const winner = board[winningLine[0]];
+        scores[winner] += 1;
+        winningLine.forEach(function(index) {
+          cells[index].classList.add("win");
+        });
+        updateStatus("Player " + winner + " wins!");
+      } else {
+        scores.draw += 1;
+        updateStatus("It's a draw!");
+      }
+
+      updateScores();
+      cells.forEach(function(cell) {
+        cell.disabled = true;
+      });
+    }
+
+    function handleMove(event) {
+      const cell = event.currentTarget;
+      const index = cells.indexOf(cell);
+
+      if (gameOver || board[index]) {
+        return;
+      }
+
+      board[index] = currentPlayer;
+      cell.textContent = currentPlayer;
+      cell.disabled = true;
+      cell.classList.add(currentPlayer.toLowerCase());
+      cell.setAttribute("aria-label", cell.getAttribute("aria-label") + ", " + currentPlayer);
+
+      const winningLine = getWinningLine();
+      if (winningLine) {
+        endGame(winningLine);
+        return;
+      }
+
+      if (board.every(Boolean)) {
+        endGame(null);
+        return;
+      }
+
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+      updateStatus("Player " + currentPlayer + "'s turn");
+    }
+
+    function startRound() {
+      board = Array(9).fill("");
+      currentPlayer = "X";
+      gameOver = false;
+      updateStatus("Player X's turn");
+
+      cells.forEach(function(cell, index) {
+        const row = Math.floor(index / 3) + 1;
+        const column = index % 3 + 1;
+        cell.textContent = "";
+        cell.disabled = false;
+        cell.className = "cell";
+        cell.setAttribute("aria-label", "Row " + row + ", column " + column);
+      });
+    }
+
+    function resetMatch() {
+      scores = {
+        X: 0,
+        O: 0,
+        draw: 0
+      };
+      updateScores();
+      startRound();
+    }
+
+    cells.forEach(function(cell) {
+      cell.addEventListener("click", handleMove);
+    });
+
+    restartButton.addEventListener("click", startRound);
+    resetButton.addEventListener("click", resetMatch);
+  </script>
 </body>
 </html>
-
-
