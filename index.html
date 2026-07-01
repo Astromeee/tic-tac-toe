@@ -1,22 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-YWPKQPM76G"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-YWPKQPM76G');
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tic Tac Toe</title>
   <style>
     :root {
-      --bg: #f6f4ef;
-      --ink: #1f2933;
-      --muted: #627080;
+      --bg: #fbfbfa;
+      --ink: #2f3437;
+      --muted: #787774;
       --panel: #ffffff;
-      --line: #d8dee6;
-      --x: #0f766e;
-      --o: #c2410c;
-      --accent: #334155;
-      --accent-hover: #1e293b;
-      --win: #facc15;
-      font-family: Arial, Helvetica, sans-serif;
+      --soft: #f7f6f3;
+      --line: #e9e9e7;
+      --line-strong: #d9d9d6;
+      --x: #337ea9;
+      --o: #d9730d;
+      --accent: #37352f;
+      --accent-hover: #2a2925;
+      --win: #fbf3db;
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     * {
@@ -30,91 +41,93 @@
       place-items: center;
       background: var(--bg);
       color: var(--ink);
+      padding: 24px;
     }
 
     main {
       width: min(92vw, 430px);
-      padding: 28px;
+      padding: 26px;
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 8px;
-      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+      box-shadow: 0 1px 2px rgba(15, 15, 15, 0.04);
     }
 
     h1 {
-      margin: 0 0 8px;
-      font-size: clamp(2rem, 8vw, 3rem);
-      line-height: 1;
-      text-align: center;
+      margin: 0 0 6px;
+      font-size: clamp(1.7rem, 7vw, 2.25rem);
+      line-height: 1.08;
+      text-align: left;
+      font-weight: 750;
     }
 
     .status {
       min-height: 28px;
-      margin: 0 0 18px;
+      margin: 0 0 20px;
       color: var(--muted);
-      font-size: 1.05rem;
-      font-weight: 700;
-      text-align: center;
+      font-size: 0.98rem;
+      font-weight: 550;
+      text-align: left;
     }
 
     .scoreboard {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 8px;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
 
     .score {
-      padding: 10px 8px;
+      padding: 9px 8px;
       border: 1px solid var(--line);
       border-radius: 6px;
       text-align: center;
-      background: #fafafa;
+      background: var(--soft);
     }
 
     .score span {
       display: block;
       color: var(--muted);
-      font-size: 0.78rem;
-      font-weight: 700;
-      text-transform: uppercase;
+      font-size: 0.76rem;
+      font-weight: 600;
     }
 
     .score strong {
       display: block;
-      margin-top: 4px;
-      font-size: 1.25rem;
+      margin-top: 3px;
+      font-size: 1.18rem;
+      font-weight: 700;
     }
 
     .board {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      gap: 8px;
       width: 100%;
       aspect-ratio: 1;
-      margin: 0 auto 18px;
+      margin: 0 auto 16px;
     }
 
     .cell {
       width: 100%;
       aspect-ratio: 1;
-      border: 2px solid var(--line);
+      border: 1px solid var(--line);
       border-radius: 8px;
-      background: #f8fafc;
+      background: var(--panel);
       color: var(--ink);
       cursor: pointer;
-      font-size: clamp(3rem, 18vw, 5.5rem);
-      font-weight: 900;
+      font-size: clamp(2.8rem, 17vw, 5rem);
+      font-weight: 650;
       line-height: 1;
-      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+      transition: border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
     }
 
     .cell:hover:not(:disabled),
     .cell:focus-visible {
-      border-color: var(--accent);
-      background: #eef2f7;
+      border-color: var(--line-strong);
+      background: var(--soft);
+      box-shadow: inset 0 0 0 1px var(--line);
       outline: none;
-      transform: translateY(-1px);
     }
 
     .cell:disabled {
@@ -130,9 +143,9 @@
     }
 
     .cell.win {
-      border-color: #eab308;
+      border-color: #e8dca9;
       background: var(--win);
-      color: #171717;
+      color: var(--accent);
     }
 
     .controls {
@@ -143,20 +156,53 @@
 
     button.action {
       min-height: 44px;
-      border: 0;
+      border: 1px solid var(--line);
       border-radius: 6px;
-      background: var(--accent);
-      color: white;
+      background: var(--soft);
+      color: var(--accent);
       cursor: pointer;
-      font-size: 1rem;
-      font-weight: 800;
+      font-size: 0.95rem;
+      font-weight: 650;
     }
 
     button.action:hover,
     button.action:focus-visible {
-      background: var(--accent-hover);
-      outline: 3px solid rgba(51, 65, 85, 0.22);
+      border-color: var(--line-strong);
+      background: #efeeeb;
+      outline: 3px solid rgba(55, 53, 47, 0.12);
       outline-offset: 2px;
+    }
+
+    .confetti-layer {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 10;
+    }
+
+    .confetti {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      width: 8px;
+      height: 12px;
+      border-radius: 2px;
+      opacity: 0;
+      animation: confetti-fall 900ms cubic-bezier(0.18, 0.8, 0.32, 1) forwards;
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        opacity: 1;
+        transform: translate3d(0, -8px, 0) rotate(0deg);
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate3d(var(--x-shift), 58vh, 0) rotate(var(--spin));
+      }
     }
 
     @media (max-width: 380px) {
@@ -171,6 +217,7 @@
   </style>
 </head>
 <body>
+  <div class="confetti-layer" id="confetti-layer" aria-hidden="true"></div>
   <main>
     <h1>Tic Tac Toe</h1>
     <p class="status" id="status" aria-live="polite">Player X's turn</p>
@@ -213,9 +260,11 @@
     const statusText = document.querySelector("#status");
     const restartButton = document.querySelector("#restart");
     const resetButton = document.querySelector("#reset");
+    const confettiLayer = document.querySelector("#confetti-layer");
     const scoreX = document.querySelector("#score-x");
     const scoreO = document.querySelector("#score-o");
     const scoreDraw = document.querySelector("#score-draw");
+    const confettiColors = ["#337ea9", "#d9730d", "#448361", "#cb912f", "#9f6b53"];
 
     const winningLines = [
       [0, 1, 2],
@@ -256,6 +305,31 @@
       });
     }
 
+    function celebrateRound() {
+      confettiLayer.innerHTML = "";
+
+      for (let index = 0; index < 42; index += 1) {
+        const piece = document.createElement("span");
+        const drift = Math.round(Math.random() * 360 - 180);
+        const start = Math.round(Math.random() * 80 + 10);
+        const delay = Math.round(Math.random() * 160);
+        const duration = Math.round(Math.random() * 450 + 750);
+
+        piece.className = "confetti";
+        piece.style.left = start + "%";
+        piece.style.background = confettiColors[index % confettiColors.length];
+        piece.style.animationDelay = delay + "ms";
+        piece.style.animationDuration = duration + "ms";
+        piece.style.setProperty("--x-shift", drift + "px");
+        piece.style.setProperty("--spin", Math.round(Math.random() * 540 + 180) + "deg");
+        confettiLayer.appendChild(piece);
+      }
+
+      window.setTimeout(function() {
+        confettiLayer.innerHTML = "";
+      }, 1400);
+    }
+
     function endGame(winningLine) {
       gameOver = true;
 
@@ -272,6 +346,7 @@
       }
 
       updateScores();
+      celebrateRound();
       cells.forEach(function(cell) {
         cell.disabled = true;
       });
