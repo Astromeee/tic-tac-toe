@@ -235,10 +235,34 @@
     .cell:hover:not(:disabled) { background: var(--raised-hover); box-shadow: inset 0 0 0 3px var(--ice); }
     .cell:active:not(:disabled) { transform: scale(.96); }
     .cell:disabled { cursor: default; }
-    .cell.x { color: var(--lime); }
-    .cell.o { color: var(--amber); }
+    .cell.x { --mark: var(--lime); color: var(--lime); }
+    .cell.o { --mark: var(--amber); color: var(--amber); }
     .cell.placed { animation: place-mark 220ms var(--ease); }
-    .cell.win { background: #23416d; box-shadow: inset 0 0 0 4px var(--ice); animation: win-pulse 700ms ease-in-out 2; }
+    .cell.win {
+      position: relative;
+      z-index: 2;
+      background: #294a79;
+      box-shadow: inset 0 0 0 4px var(--ice), 0 0 0 3px var(--cabinet);
+      animation: pixel-charge 520ms steps(3, end) both;
+      animation-delay: calc(var(--win-step, 0) * 90ms);
+    }
+
+    .board { position: relative; overflow: hidden; }
+    .board.victory::after {
+      content: "";
+      position: absolute;
+      z-index: 4;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: var(--ice);
+      box-shadow: 0 0 0 3px var(--lime), 0 0 12px 4px rgba(185, 237, 43, .72);
+      pointer-events: none;
+      animation: power-scan 680ms steps(8, end) both;
+    }
+
+    .status.victory-message { animation: crt-lock 620ms steps(2, end) both; }
 
     .hint {
       display: inline-block;
@@ -289,14 +313,26 @@
       image-rendering: pixelated;
       pointer-events: none;
     }
-    .confetti-layer { position: fixed; inset: 0; z-index: 10; overflow: hidden; pointer-events: none; }
-    .confetti { position: absolute; top: -14px; width: 8px; height: 12px; opacity: 0; animation: confetti-fall 900ms var(--ease) forwards; }
-
     .arcade-cabinet.picker-collapsed .game-picker { max-height: 0; overflow: hidden; opacity: 0; padding: 0; border: 0; }
 
     @keyframes place-mark { from { opacity: .25; transform: scale(.65); } to { opacity: 1; transform: scale(1); } }
-    @keyframes win-pulse { 50% { background: #31578b; transform: translateY(-2px); } }
-    @keyframes confetti-fall { 0% { opacity: 1; transform: translate3d(0,-8px,0) rotate(0); } 100% { opacity: 0; transform: translate3d(var(--drift),65vh,0) rotate(var(--spin)); } }
+    @keyframes pixel-charge {
+      0% { color: var(--white); filter: brightness(1); transform: scale(1); }
+      40% { color: var(--ice); filter: brightness(1.7); transform: scale(1.04); }
+      72% { color: var(--mark); filter: brightness(2); transform: scale(.97); }
+      100% { filter: brightness(1.25); transform: scale(1); }
+    }
+    @keyframes power-scan {
+      0% { opacity: 0; transform: translateY(-10px); }
+      12% { opacity: 1; }
+      88% { opacity: 1; }
+      100% { opacity: 0; transform: translateY(460px); }
+    }
+    @keyframes crt-lock {
+      0%, 18%, 38% { opacity: .25; transform: scaleX(.88); filter: brightness(2); }
+      10%, 28%, 52% { opacity: 1; transform: scaleX(1.04); }
+      100% { opacity: 1; transform: scaleX(1); filter: brightness(1.2); }
+    }
 
     @media (max-width: 850px) {
       .game-layout { grid-template-columns: 110px minmax(270px, 440px) 110px; gap: 18px; padding-bottom: 180px; }
@@ -341,12 +377,11 @@
 
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
-      .confetti-layer { display: none; }
+      .board.victory::after { display: none; }
     }
   </style>
 </head>
 <body>
-  <div class="confetti-layer" id="confetti-layer" aria-hidden="true"></div>
   <div class="arcade-cabinet" id="arcade-cabinet">
     <header class="site-header">
       <div class="brand" aria-label="Arcade Break">Arcade Break</div>
@@ -412,12 +447,10 @@
     const resetButton = document.querySelector("#reset");
     const menuButton = document.querySelector("#menu-button");
     const cabinet = document.querySelector("#arcade-cabinet");
-    const confettiLayer = document.querySelector("#confetti-layer");
+    const gameBoard = document.querySelector(".board");
     const scoreX = document.querySelector("#score-x");
     const scoreO = document.querySelector("#score-o");
     const scoreDraw = document.querySelector("#score-draw");
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const confettiColors = ["#b9ed2b", "#ffa51f", "#b9d8ff", "#f6f7ff"];
     const winningLines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
     let board = Array(9).fill("");
     let currentPlayer = "X";
@@ -428,35 +461,23 @@
     function updateScores() { scoreX.textContent = scores.X; scoreO.textContent = scores.O; scoreDraw.textContent = scores.draw; }
     function getWinningLine() { return winningLines.find(line => { const first = board[line[0]]; return first && line.every(index => board[index] === first); }); }
 
-    function celebrateRound() {
-      if (reducedMotion.matches) return;
-      confettiLayer.replaceChildren();
-      for (let index = 0; index < 34; index += 1) {
-        const piece = document.createElement("span");
-        piece.className = "confetti";
-        piece.style.left = Math.round(Math.random() * 80 + 10) + "%";
-        piece.style.background = confettiColors[index % confettiColors.length];
-        piece.style.animationDelay = Math.round(Math.random() * 140) + "ms";
-        piece.style.setProperty("--drift", Math.round(Math.random() * 320 - 160) + "px");
-        piece.style.setProperty("--spin", Math.round(Math.random() * 540 + 180) + "deg");
-        confettiLayer.appendChild(piece);
-      }
-      window.setTimeout(() => confettiLayer.replaceChildren(), 1300);
-    }
-
     function endGame(winningLine) {
       gameOver = true;
       if (winningLine) {
         const winner = board[winningLine[0]];
         scores[winner] += 1;
-        winningLine.forEach(index => cells[index].classList.add("win"));
+        winningLine.forEach((index, step) => {
+          cells[index].classList.add("win");
+          cells[index].style.setProperty("--win-step", step);
+        });
+        gameBoard.classList.add("victory");
+        statusText.classList.add("victory-message");
         updateStatus(winner + " wins!", winner);
       } else {
         scores.draw += 1;
         updateStatus("Round draw!", "draw");
       }
       updateScores();
-      celebrateRound();
       cells.forEach(cell => { cell.disabled = true; });
     }
 
@@ -478,8 +499,10 @@
 
     function startRound() {
       board = Array(9).fill(""); currentPlayer = "X"; gameOver = false; updateStatus("X's turn", "X");
+      gameBoard.classList.remove("victory");
+      statusText.classList.remove("victory-message");
       cells.forEach((cell, index) => {
-        cell.textContent = ""; cell.disabled = false; cell.className = "cell";
+        cell.textContent = ""; cell.disabled = false; cell.className = "cell"; cell.style.removeProperty("--win-step");
         cell.setAttribute("aria-label", "Row " + (Math.floor(index / 3) + 1) + ", column " + (index % 3 + 1) + ", empty");
       });
       cells[0].focus();
