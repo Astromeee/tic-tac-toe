@@ -1,14 +1,14 @@
 # Pocket Pixel Design QA
 
 - Source visual truth: `/Users/astromee/.codex/generated_images/019f37c8-fecc-7280-b47b-7def0b012756/exec-b501ccd8-21a2-4696-8a04-96b21cc0775b.png` (Option C panel)
-- Implementation screenshots: `/tmp/pocket-pixel-desktop-v2.png`, `/tmp/pocket-pixel-mobile.png`
-- Comparison composites: `/tmp/pocket-pixel-comparison.png`, `/tmp/pocket-pixel-mobile-comparison.png`
+- Implementation screenshots: `/tmp/pocket-pixel-full-bottom-v2.png`, `/tmp/pocket-pixel-mobile.png`
+- Comparison composites: `/tmp/pocket-pixel-bottom-comparison.png`, `/tmp/pocket-pixel-mobile-comparison.png`
 - Viewports: 1280×900 desktop and 390×844 mobile
 - State: Source shows a played round; implementation is compared in its natural empty-round state.
 
 **Full-view comparison evidence**
 
-The implementation now follows the source composition: bordered navy cabinet, internal header and menu control, three compact game tabs, left score tower, centered square board, right restart/reset stack, bordered instruction label, and bottom-right pixel island scenery. Mobile collapses into the same narrow handheld rhythm shown by the source inset.
+The implementation now follows the source composition: bordered navy cabinet, internal header and menu control, three compact game tabs, left score tower, centered square board, right restart/reset stack, bordered instruction label, and a full-width pixel landscape spanning the cabinet floor. Mobile collapses into the same narrow handheld rhythm shown by the source inset.
 
 **Focused region comparison evidence**
 
@@ -20,7 +20,7 @@ Header/navigation, board/score/control grouping, mobile stacking, typography, an
 - Fonts and typography: Press Start 2P supplies the chunky display marks; Space Mono keeps compact labels readable. Hierarchy and wrapping match the source closely.
 - Spacing and layout rhythm: Desktop uses the same three-column game composition; mobile board, scores, and controls fill the narrow canvas at comparable proportions.
 - Colors and visual tokens: deep navy, lime, amber, pale blue, and indigo borders map directly to the selected concept.
-- Image quality and asset fidelity: the scenery is a dedicated generated pixel-art asset with crisp pixel rendering and matching subject matter.
+- Image quality and asset fidelity: the scenery is a dedicated generated pixel-art asset with crisp pixel rendering, a continuous waterline, and balanced mountain/island anchors across the full width.
 - Copy and content: visible labels match the reference's concise arcade language while retaining accessible player names in the scoreboard.
 
 **Patches made**
@@ -30,6 +30,7 @@ Header/navigation, board/score/control grouping, mobile stacking, typography, an
 - Added a generated pixel landscape asset matching the source art direction.
 - Added functional menu collapse, tactile controls, responsive stacking, and preserved complete game behavior.
 - Corrected icon-font loading after the first capture exposed oversized fallback glyphs.
+- Expanded the landscape from a right-aligned accent to a full-width cabinet footer and removed the separate text-based sparkle decoration.
 
 **Follow-up Polish**
 

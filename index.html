@@ -281,16 +281,14 @@
     .scenery {
       position: absolute;
       z-index: 1;
-      right: 0;
+      left: 0;
       bottom: 0;
-      width: min(660px, 58%);
+      width: 100%;
       height: auto;
-      opacity: .92;
+      opacity: .96;
       image-rendering: pixelated;
       pointer-events: none;
     }
-
-    .sparkles { position: absolute; z-index: 1; right: 7%; bottom: 230px; color: #34548d; font-family: var(--pixel); font-size: .8rem; line-height: 4; opacity: .8; }
     .confetti-layer { position: fixed; inset: 0; z-index: 10; overflow: hidden; pointer-events: none; }
     .confetti { position: absolute; top: -14px; width: 8px; height: 12px; opacity: 0; animation: confetti-fall 900ms var(--ease) forwards; }
 
@@ -302,7 +300,6 @@
 
     @media (max-width: 850px) {
       .game-layout { grid-template-columns: 110px minmax(270px, 440px) 110px; gap: 18px; padding-bottom: 180px; }
-      .scenery { width: 70%; }
     }
 
     @media (max-width: 680px) {
@@ -333,8 +330,7 @@
       .controls { grid-template-columns: 1fr 1fr; gap: 10px; }
       .action { min-height: 54px; display: flex; justify-content: center; font-size: .6rem; }
       .action .material-symbols-rounded { font-size: 23px; }
-      .scenery { width: 100%; opacity: .72; }
-      .sparkles { display: none; }
+      .scenery { opacity: .78; }
     }
 
     @media (max-width: 340px) {
@@ -406,7 +402,6 @@
       </section>
     </main>
 
-    <div class="sparkles" aria-hidden="true">+<br>+&nbsp;&nbsp;+</div>
     <img class="scenery" src="assets/pocket-pixel-island.png" alt="" aria-hidden="true">
   </div>
 
